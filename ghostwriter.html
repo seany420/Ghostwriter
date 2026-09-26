@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ghostwriter">
+<meta name="theme-color" content="#0e0d0c">
+<title>Ghostwriter</title>
+<link rel="apple-touch-icon" id="touchIcon" href="">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e0d0c; --panel:#171514; --panel2:#1f1c1a; --line:#2e2a27;
+  --ink:#ece4d6; --muted:#9b9185; --accent:#b8413a; --accent2:#8f2a2a;
+  --gold:#c9a55c; --ok:#6f9a6a; --r:14px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Inter,system-ui,-apple-system,sans-serif}
+body{padding:env(safe-area-inset-top) 0 calc(76px + env(safe-area-inset-bottom))}
+h1,h2,h3{font-family:"IM Fell English",Georgia,serif;font-weight:400;margin:0}
+header{padding:18px 16px 8px;display:flex;align-items:baseline;gap:10px}
+header h1{font-size:30px;letter-spacing:.5px}
+header span{color:var(--muted);font-style:italic;font-family:"IM Fell English",serif}
+main{padding:0 16px;max-width:760px;margin:0 auto}
+section{display:none}
+section.on{display:block}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin:12px 0}
+.card h2{font-size:22px;margin-bottom:8px}
+.card h3{font-size:18px;margin:10px 0 6px}
+label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+input[type=text],input[type=password],input[type=number],select,textarea{
+  width:100%;background:var(--panel2);color:var(--ink);border:1px solid var(--line);
+  border-radius:10px;padding:10px 12px;font:16px Inter,system-ui,sans-serif}
+textarea{min-height:180px;line-height:1.5;resize:vertical}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row>*{flex:1}
+button{font:600 15px Inter,system-ui,sans-serif;border:0;border-radius:12px;padding:12px 14px;
+  background:var(--panel2);color:var(--ink);border:1px solid var(--line)}
+button.primary{background:var(--accent2);border-color:var(--accent)}
+button.small{padding:7px 10px;font-size:13px;border-radius:9px}
+button:disabled{opacity:.45}
+.seg{display:flex;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:3px}
+.seg button{flex:1;background:none;border:0;padding:9px;border-radius:9px;color:var(--muted)}
+.seg button.on{background:var(--accent2);color:var(--ink)}
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.thumb{position:relative;background:var(--panel2);border-radius:10px;overflow:hidden;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center}
+.thumb img{max-width:100%;max-height:100%}
+.thumb .tb{position:absolute;bottom:4px;left:4px;right:4px;display:flex;justify-content:space-between}
+.thumb .tb button{padding:4px 8px;font-size:12px;background:#000a}
+.thumb .n{position:absolute;top:4px;left:6px;font-size:12px;color:var(--gold)}
+.muted{color:var(--muted);font-size:14px}
+.pageimg{width:100%;border-radius:10px;display:block;background:#fff}
+.imgwrap{max-height:320px;overflow:auto;border-radius:10px;margin-bottom:10px}
+.imgwrap.zoom{max-height:70vh}
+.imgwrap.zoom .pageimg{width:220%}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{background:#c9a55c22;border:1px solid var(--gold);color:var(--gold);border-radius:20px;padding:5px 11px;font-size:14px}
+.chip.ill{border-color:var(--accent);color:#e07a72;background:#b8413a22}
+.check{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--muted);font-size:14px}
+.check input{width:20px;height:20px}
+.stat{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.stat div{background:var(--panel2);border-radius:10px;padding:10px}
+.stat b{display:block;font-size:24px;font-family:"IM Fell English",serif;font-weight:400}
+.stat small{color:var(--muted)}
+.list{margin:0;padding:0;list-style:none}
+.list li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+.list li:last-child{border:0}
+.list code{color:var(--gold);font-family:ui-monospace,Menlo,monospace;font-size:14px}
+.x{background:none;border:0;color:var(--muted);padding:4px 8px}
+canvas#chart{width:100%;height:140px;display:block}
+nav{position:fixed;left:0;right:0;bottom:0;background:#0b0a09ee;backdrop-filter:blur(8px);
+  border-top:1px solid var(--line);display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+nav button{flex:1;background:none;border:0;color:var(--muted);font-size:12px;padding:8px 2px;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button .i{font-size:20px;line-height:1}
+nav button.on{color:var(--ink)}
+nav button.on .i{color:var(--accent)}
+#toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);
+  background:var(--panel2);border:1px solid var(--line);padding:10px 16px;border-radius:12px;opacity:0;
+  transition:opacity .2s;pointer-events:none;max-width:90vw;z-index:9}
+#toast.on{opacity:1}
+#busy{position:fixed;inset:0;background:#000c;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:8}
+#busy.on{display:flex}
+#busy .q{width:46px;height:46px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:s 1s linear infinite}
+@keyframes s{to{transform:rotate(360deg)}}
+#busy p{font-family:"IM Fell English",serif;font-size:20px;font-style:italic;margin:0;text-align:center;padding:0 20px}
+details summary{cursor:pointer;color:var(--muted);font-size:14px;margin-top:8px}
+pre.md{white-space:pre-wrap;background:var(--panel2);padding:10px;border-radius:10px;font-size:13px;max-height:260px;overflow:auto}
+</style>
+</head>
+<body>
+<header><h1>Ghostwriter</h1><span>it learns your hand</span></header>
+<main>
+
+<!-- SCAN -->
+<section id="tab-scan" class="on">
+  <div class="card">
+    <h2>New scan</h2>
+    <label>What kind of writing?</label>
+    <div class="seg" id="styleSeg">
+      <button data-v="cursive" class="on">Cursive</button>
+      <button data-v="print">Print</button>
+      <button data-v="mixed">Mixed</button>
+    </div>
+    <label>Title (optional)</label>
+    <input type="text" id="scanTitle" placeholder="Leave blank to use the first line">
+    <div class="row" style="margin-top:12px">
+      <button class="primary" id="btnCamera">📷 Take photo</button>
+      <button id="btnLibrary">🖼 Choose photos</button>
+    </div>
+    <input type="file" id="fileCamera" accept="image/*" capture="environment" hidden>
+    <input type="file" id="fileLibrary" accept="image/*" multiple hidden>
+    <div class="thumbs" id="thumbs"></div>
+    <div class="check"><input type="checkbox" id="journal"><span>🔒 Journal mode: nothing stays in this app after it goes to Obsidian</span></div>
+    <div class="check"><input type="checkbox" id="enhance"><span>Enhance contrast (helps with light ink or shadows)</span></div>
+    <button class="primary" id="btnTranscribe" style="width:100%;margin-top:14px" disabled>Transcribe</button>
+    <p class="muted" id="scanHint">Shoot straight down, good light, one page per photo. Pages go into one note, in order.</p>
+  </div>
+</section>
+
+<!-- REVIEW -->
+<section id="tab-review">
+  <div class="card">
+    <h2>Review</h2>
+    <p class="muted">Gold words are guesses. Tap one to fix it, or edit the text directly. Every correction teaches it your hand.</p>
+    <p class="muted" id="journalNote" style="display:none;color:var(--gold)">🔒 Journal mode. This entry won't be kept here. After you send it, check it landed in Obsidian, then tap Done to wipe it from the app.</p>
+    <label>Title</label>
+    <input type="text" id="revTitle">
+  </div>
+  <div id="revPages"></div>
+  <div class="card">
+    <button class="primary" id="btnSend" style="width:100%">Confirm & send to Obsidian</button>
+    <div class="row" style="margin-top:8px">
+      <button id="btnCopy">Copy</button>
+      <button id="btnShare">Share .md</button>
+      <button id="btnConfirmOnly">Save only</button>
+    </div>
+    <button id="btnDiscard" style="width:100%;margin-top:8px">Discard</button>
+  </div>
+</section>
+
+<!-- HISTORY -->
+<section id="tab-history">
+  <div class="card"><h2>History</h2><p class="muted">Confirmed transcriptions, newest first. Journal-mode entries are never kept here.</p>
+    <button id="btnClearHist" style="width:100%;margin-top:8px">Clear all history</button></div>
+  <div id="histList"></div>
+</section>
+
+<!-- LEARNING -->
+<section id="tab-learn">
+  <div class="card">
+    <h2>What it knows</h2>
+    <div class="stat" id="stats"></div>
+    <h3>Accuracy per page</h3>
+    <canvas id="chart"></canvas>
+    <p class="muted">Share of words it got right before you touched them.</p>
+  </div>
+  <div class="card">
+    <h2>Problem letters</h2>
+    <p class="muted">Letters it keeps misreading, pulled from your corrections. These are the ones worth drilling.</p>
+    <ul class="list" id="charList"></ul>
+    <button id="btnExportProblems" style="width:100%;margin-top:10px">Send problem letters to Obsidian</button>
+  </div>
+  <div class="card">
+    <h2>Known misreads</h2>
+    <p class="muted">What it read → what you actually wrote. Sent with every scan.</p>
+    <ul class="list" id="pairList"></ul>
+  </div>
+  <div class="card">
+    <h2>Writer profile</h2>
+    <p class="muted">A short description of your letterforms, written from your corrections. Edit it freely.</p>
+    <textarea id="profile" style="min-height:140px"></textarea>
+    <div class="row" style="margin-top:8px">
+      <button id="btnRebuild">Rebuild from corrections</button>
+      <button id="btnSaveProfile">Save</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Reference pages</h2>
+    <p class="muted" id="refInfo"></p>
+    <button id="btnClearRefs" style="width:100%">Clear reference pages</button>
+  </div>
+</section>
+
+<!-- SETTINGS -->
+<section id="tab-settings">
+  <div class="card">
+    <h2>Claude</h2>
+    <label>Anthropic API key</label>
+    <input type="password" id="s_apiKey" placeholder="sk-ant-..." autocomplete="off">
+    <label>Model</label>
+    <select id="s_model">
+      <option value="claude-sonnet-5">Sonnet 5 (default, fast)</option>
+      <option value="claude-opus-5-5">Opus 5.5 (hard pages)</option>
+      <option value="claude-fable-5-1">Fable 5.1 (strongest)</option>
+      <option value="claude-haiku-4-5-20251001">Haiku 4.5 (cheapest)</option>
+    </select>
+    <label>Reference pages sent per scan</label>
+    <select id="s_refs"><option>0</option><option>1</option><option>2</option><option>3</option></select>
+    <p class="muted">More references = better reads on your hand, slightly higher cost per scan.</p>
+    <div class="check"><input type="checkbox" id="s_keepLines"><span>Keep line breaks exactly as written (off = join into paragraphs)</span></div>
+    <button id="btnTestKey" style="width:100%;margin-top:12px">Test key</button>
+  </div>
+  <div class="card">
+    <h2>Obsidian</h2>
+    <label>Vault name (exactly as it appears in Obsidian)</label>
+    <input type="text" id="s_vault" placeholder="blank = last opened vault">
+    <label>Folder for transcriptions</label>
+    <input type="text" id="s_folder">
+    <label>Filename pattern ({date} {time} {title})</label>
+    <input type="text" id="s_filename">
+    <label>Tags (comma separated)</label>
+    <input type="text" id="s_tags">
+    <div class="check"><input type="checkbox" id="s_frontmatter"><span>Add frontmatter (date, hand, pages, tags)</span></div>
+    <label>Folder for the problem-letters note</label>
+    <input type="text" id="s_problemFolder">
+  </div>
+  <div class="card">
+    <h2>Backup</h2>
+    <p class="muted">Everything it has learned lives on this phone. Back it up now and then.</p>
+    <div class="row">
+      <button id="btnExport">Export backup</button>
+      <button id="btnImport">Import backup</button>
+    </div>
+    <input type="file" id="fileImport" accept="application/json,.json" hidden>
+    <button id="btnWipe" style="width:100%;margin-top:8px;color:#e07a72">Erase all learning</button>
+  </div>
+</section>
+</main>
+
+<nav>
+  <button data-tab="scan" class="on"><span class="i">✒︎</span>Scan</button>
+  <button data-tab="history"><span class="i">☰</span>History</button>
+  <button data-tab="learn"><span class="i">◉</span>Learning</button>
+  <button data-tab="settings"><span class="i">⚙︎</span>Settings</button>
+</nav>
+<div id="toast"></div>
+<div id="busy"><div class="q"></div><p id="busyMsg">Reading your hand…</p></div>
+
+<script>
+/* ============ basics ============ */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(m, ms=2600){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),ms); }
+function busy(on, msg){ $('#busy').classList.toggle('on',on); if(msg) $('#busyMsg').textContent=msg; }
+const OPEN='\u27E8', CLOSE='\u27E9'; // ⟨ ⟩ uncertainty markers
+
+/* ============ settings ============ */
+const DEF = { apiKey:'', model:'claude-sonnet-5', refs:2, keepLines:false, vault:'',
+  folder:'Inbox/Handwriting', filename:'{date} {title}', tags:'handwritten', frontmatter:true,
+  problemFolder:'30-Projects/30.5-Handwriting', enhance:false, journal:true };
+let S = Object.assign({}, DEF, JSON.parse(localStorage.getItem('gw_settings')||'{}'));
+const saveS = () => localStorage.setItem('gw_settings', JSON.stringify(S));
+
+/* ============ learning store ============ */
+const LDEF = { pairs:{}, chars:{}, lex:{}, fixed:{}, profile:'', stats:[] };
+let L = Object.assign({}, LDEF, JSON.parse(localStorage.getItem('gw_learn')||'{}'));
+const saveL = () => localStorage.setItem('gw_learn', JSON.stringify(L));
+
+/* ============ IndexedDB (reference images, history) ============ */
+let _db;
+function db(){ return _db ||= new Promise((res,rej)=>{ const r=indexedDB.open('ghostwriter',1);
+  r.onupgradeneeded=()=>{ const d=r.result; d.createObjectStore('samples',{keyPath:'id'}); d.createObjectStore('history',{keyPath:'id'}); };
+  r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+async function idb(store, mode, fn){ const d=await db(); return new Promise((res,rej)=>{ const tx=d.transaction(store,mode); const req=fn(tx.objectStore(store)); tx.oncomplete=()=>res(req?req.result:undefined); tx.onerror=()=>rej(tx.error); }); }
+const getAll = st => idb(st,'readonly',s=>s.getAll());
+const put = (st,o) => idb(st,'readwrite',s=>s.put(o));
+const del = (st,id) => idb(st,'readwrite',s=>s.delete(id));
+const clearStore = st => idb(st,'readwrite',s=>s.clear());
+
+/* ============ image handling ============ */
+function loadImg(src){ return new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; }); }
+function renderPage(img, rot=0, enhance=false, maxSide=1800, q=0.85){
+  const w0=img.naturalWidth, h0=img.naturalHeight, sc=Math.min(1, maxSide/Math.max(w0,h0));
+  const w=Math.round(w0*sc), h=Math.round(h0*sc), swap=rot%180!==0;
+  const c=document.createElement('canvas'); c.width=swap?h:w; c.height=swap?w:h;
+  const x=c.getContext('2d'); x.translate(c.width/2,c.height/2); x.rotate(rot*Math.PI/180); x.drawImage(img,-w/2,-h/2,w,h);
+  if(enhance){
+    const d=x.getImageData(0,0,c.width,c.height), p=d.data, hist=new Uint32Array(256);
+    for(let i=0;i<p.length;i+=4){ const g=(p[i]*.299+p[i+1]*.587+p[i+2]*.114)|0; p[i]=g; hist[g]++; }
+    const n=p.length/4; let acc=0, lo=0, hi=255;
+    for(let v=0;v<256;v++){ acc+=hist[v]; if(acc>n*.02){ lo=v; break; } }
+    acc=0; for(let v=255;v>=0;v--){ acc+=hist[v]; if(acc>n*.02){ hi=v; break; } }
+    const span=Math.max(1,hi-lo);
+    for(let i=0;i<p.length;i+=4){ let v=(p[i]-lo)*255/span; v=v<0?0:v>255?255:v; p[i]=p[i+1]=p[i+2]=v; }
+    x.putImageData(d,0,0);
+  }
+  return c.toDataURL('image/jpeg', q);
+}
+
+/* ============ Claude API ============ */
+async function callClaude(system, content, maxTokens=4096){
+  if(!S.apiKey) throw new Error('Add your API key in Settings first.');
+  const r = await fetch('https://api.anthropic.com/v1/messages', { method:'POST',
+    headers:{ 'content-type':'application/json', 'x-api-key':S.apiKey, 'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true' },
+    body: JSON.stringify({ model:S.model, max_tokens:maxTokens, system, messages:[{role:'user', content}] }) });
+  if(!r.ok){ let m=r.status+''; try{ const j=await r.json(); m=j.error?.message||m; }catch(e){} throw new Error('Claude: '+m); }
+  const j = await r.json();
+  return j.content.filter(b=>b.type==='text').map(b=>b.text).join('').trim();
+}
+const imgBlock = dataURL => ({ type:'image', source:{ type:'base64', media_type:'image/jpeg', data:dataURL.split(',')[1] } });
+
+function topPairs(n){ return Object.values(L.pairs).sort((a,b)=>b.n-a.n||b.last-a.last).slice(0,n); }
+function topChars(n){ return Object.entries(L.chars).sort((a,b)=>b[1]-a[1]).slice(0,n); }
+function vocab(cap=250){
+  const out=new Set();
+  Object.entries(L.fixed).sort((a,b)=>b[1]-a[1]).forEach(([w])=>out.add(w));
+  Object.entries(L.lex).filter(([,n])=>n>=2).sort((a,b)=>b[1]-a[1]).forEach(([w])=>out.add(w));
+  return [...out].slice(0,cap);
+}
+
+function systemPrompt(style){
+  const hand = {cursive:'fountain pen cursive', print:'print handwriting', mixed:'a mix of cursive and print'}[style];
+  let s = `You transcribe the handwriting of one specific person, Sean. His handwriting is often messy and inconsistent, and it degrades when he writes fast. This page is ${hand}.
+
+Rules:
+- Transcribe exactly what is written. Do not correct grammar, do not summarize, do not add commentary or headings of your own.
+- Use sentence context, his known vocabulary, and his known letter quirks below to resolve ambiguous words.
+- Wrap any word you are not confident about in ${OPEN} ${CLOSE} with your best guess inside, like ${OPEN}haunted${CLOSE}. If a word is truly illegible, write ${OPEN}?${CLOSE}.
+- Skip crossed-out text. Place caret insertions where they are marked.
+- ${S.keepLines ? 'Keep line breaks exactly where he broke lines on the page.' : 'Join wrapped lines into normal paragraphs. Keep real paragraph breaks, lists, and bullets. Rejoin words hyphenated across a line break.'}
+- Output only the transcription.`;
+  if(L.profile.trim()) s += `\n\nWRITER PROFILE (his letterform quirks):\n${L.profile.trim()}`;
+  const pr = topPairs(60);
+  if(pr.length) s += `\n\nKNOWN MISREADS (what an earlier read produced → what he actually wrote):\n` + pr.map(p=>`"${p.o}" → "${p.f}"${p.n>1?` (x${p.n})`:''}`).join('\n');
+  const ch = topChars(20);
+  if(ch.length) s += `\n\nLETTER CONFUSIONS (read as → actually):\n` + ch.map(([k,n])=>`${k} (x${n})`).join(', ');
+  const v = vocab();
+  if(v.length) s += `\n\nWORDS HE USES (prefer these when a word is ambiguous):\n` + v.join(', ');
+  return s;
+}
+
+async function pickRefs(style){
+  const n = +S.refs; if(!n) return [];
+  let all = (await getAll('samples')).sort((a,b)=>b.t-a.t);
+  let pool = all.filter(r=>style==='mixed'||r.style===style||r.style==='mixed');
+  if(!pool.length) pool = all;
+  const out=[]; if(pool[0]) out.push(pool[0]);
+  pool.slice(1).sort((a,b)=>b.edits-a.edits).forEach(r=>{ if(out.length<n) out.push(r); });
+  return out.slice(0,n);
+}
+
+async function readPage(dataURL, style){
+  const refs = await pickRefs(style), content=[];
+  if(refs.length){
+    content.push({type:'text', text:'Reference pages in this same writer\'s hand, each followed by its verified transcription. Study how his letters look.'});
+    refs.forEach((r,i)=>{ content.push(imgBlock(r.img)); content.push({type:'text', text:`Verified transcription of reference ${i+1}:\n${r.text}`}); });
+    content.push({type:'text', text:'Now transcribe this new page:'});
+  }
+  content.push(imgBlock(dataURL));
+  content.push({type:'text', text:'Transcribe this page following the rules.'});
+  return callClaude(systemPrompt(style), content);
+}
+
+/* ============ diff + learning ============ */
+const norm = w => w.toLowerCase().replace(/[^\p{L}\p{N}']/gu,'').replace(/^'+|'+$/g,'');
+function align(a, b, eq){
+  const n=a.length, m=b.length, dp=[];
+  for(let i=0;i<=n;i++) dp.push(new Uint16Array(m+1));
+  for(let i=n-1;i>=0;i--) for(let j=m-1;j>=0;j--) dp[i][j] = eq(a[i],b[j]) ? dp[i+1][j+1]+1 : Math.max(dp[i+1][j], dp[i][j+1]);
+  const ops=[]; let i=0,j=0;
+  while(i<n&&j<m){ if(eq(a[i],b[j])){ ops.push({t:'=',a:a[i],b:b[j]}); i++; j++; } else if(dp[i+1][j]>=dp[i][j+1]){ ops.push({t:'-',a:a[i++]}); } else ops.push({t:'+',b:b[j++]}); }
+  while(i<n) ops.push({t:'-',a:a[i++]}); while(j<m) ops.push({t:'+',b:b[j++]});
+  return ops;
+}
+function runs(ops){ // group consecutive non-matching ops
+  const out=[]; let cur=null;
+  for(const o of ops){ if(o.t==='='){ if(cur){ out.push(cur); cur=null; } continue; }
+    cur ||= {d:[],i:[]}; (o.t==='-'?cur.d:cur.i).push(o.t==='-'?o.a:o.b); }
+  if(cur) out.push(cur); return out;
+}
+const stripMarks = t => t.replace(new RegExp(OPEN+'\\?'+CLOSE,'g'),'[illegible]').replace(new RegExp('['+OPEN+CLOSE+']','g'),'');
+
+function learn(rawAI, finalText, style){
+  const A = stripMarks(rawAI).split(/\s+/).filter(Boolean), B = finalText.split(/\s+/).filter(Boolean);
+  const ops = align(A, B, (x,y)=>norm(x)===norm(y));
+  let edits=0; const now=Date.now(), newPairs=[];
+  for(const r of runs(ops)){
+    edits += Math.max(r.d.length, r.i.length);
+    if(r.d.length && r.i.length && r.d.length<=3 && r.i.length<=3){
+      const o=r.d.map(norm).filter(Boolean).join(' '), f=r.i.map(norm).filter(Boolean).join(' ');
+      if(!o||!f||o===f) continue;
+      if(/\billegible\b/.test(o)){ f.split(' ').forEach(w=>{ if(w.length>=3) L.fixed[w]=(L.fixed[w]||0)+1; }); continue; }
+      const k=o+'→'+f; L.pairs[k] ||= {o,f,n:0,last:0}; L.pairs[k].n++; L.pairs[k].last=now; newPairs.push(k);
+      f.split(' ').forEach(w=>{ if(w.length>=3) L.fixed[w]=(L.fixed[w]||0)+1; });
+      if(r.d.length===1 && r.i.length===1) learnChars(o,f);
+    }
+  }
+  B.forEach(w=>{ const n=norm(w); if(n.length>=4) L.lex[n]=(L.lex[n]||0)+1; });
+  const words = B.length;
+  L.stats.push({t:now, words, edits, style});
+  if(L.stats.length>500) L.stats=L.stats.slice(-500);
+  // keep lexicon from bloating
+  const lk=Object.keys(L.lex); if(lk.length>4000){ Object.entries(L.lex).sort((a,b)=>a[1]-b[1]).slice(0,lk.length-3000).forEach(([w])=>delete L.lex[w]); }
+  saveL();
+  return {edits, words, acc: words ? Math.max(0,1-edits/words) : 1};
+}
+function learnChars(o, f){
+  const ops = align([...o],[...f],(x,y)=>x===y);
+  for(const r of runs(ops)){
+    if(r.d.length && r.i.length && r.d.length<=2 && r.i.length<=2){
+      const k=`${r.d.join('')}→${r.i.join('')}`; L.chars[k]=(L.chars[k]||0)+1;
+    }
+  }
+}
+
+/* ============ scan tab ============ */
+let style='cursive', pending=[];
+$('#styleSeg').onclick = e => { const b=e.target.closest('button'); if(!b) return; style=b.dataset.v; [...$('#styleSeg').children].forEach(x=>x.classList.toggle('on',x===b)); };
+$('#btnCamera').onclick = () => $('#fileCamera').click();
+$('#btnLibrary').onclick = () => $('#fileLibrary').click();
+$('#enhance').checked = S.enhance;
+$('#journal').checked = S.journal;
+$('#journal').onchange = e => { S.journal=e.target.checked; saveS(); };
+$('#enhance').onchange = e => { S.enhance=e.target.checked; saveS(); drawThumbs(); };
+async function addFiles(files){
+  for(const f of files){ try{ const url=URL.createObjectURL(f); const img=await loadImg(url); pending.push({img,rot:0}); }catch(e){ toast('Could not open one of those images.'); } }
+  drawThumbs();
+}
+$('#fileCamera').onchange = e => { addFiles(e.target.files); e.target.value=''; };
+$('#fileLibrary').onchange = e => { addFiles(e.target.files); e.target.value=''; };
+function drawThumbs(){
+  $('#thumbs').innerHTML = pending.map((p,i)=>`<div class="thumb"><span class="n">${i+1}</span><img src="${renderPage(p.img,p.rot,S.enhance,360,.7)}"><div class="tb"><button data-rot="${i}">↻</button><button data-rm="${i}">✕</button></div></div>`).join('');
+  $('#btnTranscribe').disabled = !pending.length;
+  $('#btnTranscribe').textContent = pending.length>1 ? `Transcribe ${pending.length} pages` : 'Transcribe';
+}
+$('#thumbs').onclick = e => {
+  const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.rot!==undefined){ const p=pending[+b.dataset.rot]; p.rot=(p.rot+90)%360; }
+  if(b.dataset.rm!==undefined){ pending.splice(+b.dataset.rm,1); }
+  drawThumbs();
+};
+
+let session=null;
+$('#btnTranscribe').onclick = async () => {
+  if(!S.apiKey){ toast('Add your API key first.'); show('settings'); return; }
+  const pages=[];
+  try{
+    for(let i=0;i<pending.length;i++){
+      busy(true, pending.length>1 ? `Reading page ${i+1} of ${pending.length}…` : 'Reading your hand…');
+      const dataURL = renderPage(pending[i].img, pending[i].rot, S.enhance, 1800);
+      const raw = await readPage(dataURL, style);
+      pages.push({dataURL, raw, text:raw});
+    }
+  }catch(e){ busy(false); toast(e.message, 5000); return; }
+  busy(false);
+  session = {style, title:$('#scanTitle').value.trim(), pages, t:Date.now(), journal:S.journal};
+  pending=[]; drawThumbs(); $('#scanTitle').value='';
+  renderReview(); show('review');
+};
+
+/* ============ review ============ */
+function renderReview(){
+  $('#revTitle').value = session.title;
+  $('#revPages').innerHTML = session.pages.map((p,i)=>`
+    <div class="card" data-page="${i}">
+      ${session.pages.length>1?`<h3>Page ${i+1}</h3>`:''}
+      <div class="imgwrap"><img class="pageimg" src="${p.dataURL}"></div>
+      <div class="chips"></div>
+      <textarea spellcheck="false">${esc(p.text)}</textarea>
+      <div class="row" style="margin-top:8px"><button class="small acceptAll">Accept remaining guesses</button></div>
+      ${session.journal ? '' : '<div class="check"><input type="checkbox" class="asRef"><span>Save this page as a reference sample</span></div>'}
+    </div>`).join('');
+  $('#journalNote').style.display = session.journal ? 'block' : 'none';
+  $('#btnConfirmOnly').style.display = session.journal ? 'none' : '';
+  $('#btnDiscard').textContent = 'Discard';
+  document.querySelectorAll('#revPages .card').forEach(card=>{
+    const i=+card.dataset.page, ta=card.querySelector('textarea');
+    ta.oninput = () => { session.pages[i].text=ta.value; drawChips(card,i); };
+    card.querySelector('.imgwrap').onclick = e => e.currentTarget.classList.toggle('zoom');
+    card.querySelector('.acceptAll').onclick = () => { ta.value = stripMarks(ta.value); ta.oninput(); };
+    drawChips(card,i);
+  });
+}
+function drawChips(card, i){
+  const text = session.pages[i].text, re = new RegExp(OPEN+'([^'+CLOSE+']*)'+CLOSE,'g'), chips=[]; let m;
+  while((m=re.exec(text))) chips.push(m[1]);
+  const box = card.querySelector('.chips');
+  box.innerHTML = chips.length ? chips.map((w,k)=>`<button class="chip ${w==='?'?'ill':''}" data-k="${k}">${w==='?'?'illegible':esc(w)}</button>`).join('') : '<span class="muted">No flagged words. Read it over anyway.</span>';
+  box.onclick = e => {
+    const b=e.target.closest('.chip'); if(!b) return;
+    const k=+b.dataset.k, guess=chips[k];
+    const val = prompt('What does this word actually say?', guess==='?'?'':guess);
+    if(val===null) return;
+    let c=-1;
+    session.pages[i].text = session.pages[i].text.replace(re, (all, w) => (++c===k) ? val : all);
+    card.querySelector('textarea').value = session.pages[i].text;
+    drawChips(card,i);
+  };
+  // auto-check "save as reference" when the page needed work
+  const ref=card.querySelector('.asRef'); if(!ref) return; if(!ref.dataset.touched){ ref.checked = session.pages[i].text !== session.pages[i].raw || chips.length>0; }
+  ref.onchange = () => ref.dataset.touched='1';
+}
+
+const pad = n => String(n).padStart(2,'0');
+function fmtDate(t){ const d=new Date(t); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function fmtTime(t){ const d=new Date(t); return `${pad(d.getHours())}${pad(d.getMinutes())}`; }
+const cleanName = s => s.replace(/[\\/:*?"<>|#^\[\]]/g,'').replace(/\s+/g,' ').trim();
+
+function buildNote(sess, finals){
+  const body = finals.join('\n\n').trim();
+  let title = (sess.title||'').trim();
+  if(!title){ title = body.split(/\n/)[0].split(/\s+/).slice(0,6).join(' ').replace(/[.,;:!?]+$/,''); }
+  title = cleanName(title) || 'Untitled';
+  const name = cleanName(S.filename.replace('{date}',fmtDate(sess.t)).replace('{time}',fmtTime(sess.t)).replace('{title}',title)) || title;
+  const path = (S.folder.trim().replace(/^\/+|\/+$/g,'') ? S.folder.trim().replace(/^\/+|\/+$/g,'')+'/' : '') + name;
+  let md = '';
+  if(S.frontmatter){
+    const d=new Date(sess.t), tags=S.tags.split(',').map(s=>s.trim()).filter(Boolean);
+    md = `---\ntitle: "${title.replace(/"/g,"'")}"\ncreated: ${fmtDate(sess.t)}T${pad(d.getHours())}:${pad(d.getMinutes())}\nsource: handwriting\nhand: ${sess.style}\npages: ${sess.pages.length}\n${tags.length?`tags: [${tags.join(', ')}]\n`:''}---\n\n`;
+  }
+  md += body + '\n';
+  return {title, name, path, md};
+}
+function obsidianNew(path, md, overwrite=false){
+  let u = 'obsidian://new?' + (S.vault.trim()?'vault='+encodeURIComponent(S.vault.trim())+'&':'') + 'file='+encodeURIComponent(path) + '&content='+encodeURIComponent(md);
+  if(overwrite) u += '&overwrite=true';
+  const a=document.createElement('a'); a.href=u; document.body.appendChild(a); a.click(); a.remove();
+}
+async function shareMd(name, md){
+  const file = new File([md], name+'.md', {type:'text/markdown'});
+  if(navigator.canShare && navigator.canShare({files:[file]})){ try{ await navigator.share({files:[file]}); return; }catch(e){ if(e.name==='AbortError') return; } }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=name+'.md'; a.click();
+}
+
+let confirmed=null;
+async function confirmSession(){
+  if(confirmed) return confirmed;
+  session.title = $('#revTitle').value.trim();
+  const finals = session.pages.map(p=>stripMarks(p.text).trim());
+  let edits=0, words=0;
+  const refBoxes = document.querySelectorAll('#revPages .asRef');
+  for(let i=0;i<session.pages.length;i++){
+    const r = learn(session.pages[i].raw, finals[i], session.style); edits+=r.edits; words+=r.words;
+    if(refBoxes[i]?.checked && finals[i]){
+      const img = await loadImg(session.pages[i].dataURL);
+      await put('samples', {id:session.t+'_'+i, t:Date.now(), style:session.style, img:renderPage(img,0,false,1100,.8), text:finals[i], edits:r.edits});
+    }
+  }
+  const all=(await getAll('samples')).sort((a,b)=>b.t-a.t);
+  for(const s of all.slice(24)) await del('samples', s.id);
+  const note = buildNote(session, finals);
+  if(!session.journal) await put('history',{id:session.t, t:session.t, title:note.title, style:session.style, path:note.path, name:note.name, md:note.md, acc: words?1-edits/words:1});
+  confirmed = {...note, acc: words?Math.max(0,1-edits/words):1};
+  return confirmed;
+}
+function endSession(){ session=null; confirmed=null; $('#revPages').innerHTML=''; $('#revTitle').value=''; show('scan'); }
+
+$('#btnSend').onclick = async () => {
+  const n=await confirmSession(); obsidianNew(n.path, n.md);
+  if(session.journal){ toast('Sent. Check Obsidian, then come back and tap Done.', 4000); $('#btnDiscard').textContent='✓ Done, wipe it from this app'; $('#btnSend').textContent='Send to Obsidian again'; return; }
+  toast(`Learned. First-pass accuracy ${(n.acc*100).toFixed(0)}%`); setTimeout(endSession, 600);
+};
+$('#btnCopy').onclick = async () => { const n=await confirmSession(); try{ await navigator.clipboard.writeText(n.md); toast('Copied'); }catch(e){ toast('Copy blocked by the browser'); } };
+$('#btnShare').onclick = async () => { const n=await confirmSession(); await shareMd(n.name, n.md); };
+$('#btnConfirmOnly').onclick = async () => { const n=await confirmSession(); toast(`Saved to History. First-pass accuracy ${(n.acc*100).toFixed(0)}%`); endSession(); };
+$('#btnDiscard').onclick = () => { if(confirmed || confirm('Discard this scan? Nothing will be learned from it.')){ $('#btnSend').textContent='Confirm & send to Obsidian'; endSession(); } };
+
+/* ============ history ============ */
+async function renderHistory(){
+  const h=(await getAll('history')).sort((a,b)=>b.t-a.t);
+  $('#histList').innerHTML = h.length ? h.map(x=>`
+    <div class="card" data-id="${x.id}">
+      <h3>${esc(x.title)}</h3>
+      <div class="muted">${fmtDate(x.t)} · ${x.style} · ${(x.acc*100).toFixed(0)}% first pass</div>
+      <details><summary>Show text</summary><pre class="md">${esc(x.md)}</pre></details>
+      <div class="row" style="margin-top:8px">
+        <button class="small" data-act="send">To Obsidian</button>
+        <button class="small" data-act="copy">Copy</button>
+        <button class="small" data-act="del">Delete</button>
+      </div>
+    </div>`).join('') : '<p class="muted">Nothing yet.</p>';
+  $('#histList').onclick = async e => {
+    const b=e.target.closest('button[data-act]'); if(!b) return;
+    const id=+b.closest('.card').dataset.id, x=h.find(y=>y.id===id);
+    if(b.dataset.act==='send') obsidianNew(x.path, x.md);
+    if(b.dataset.act==='copy'){ try{ await navigator.clipboard.writeText(x.md); toast('Copied'); }catch(err){ toast('Copy blocked'); } }
+    if(b.dataset.act==='del' && confirm('Delete from history? What it learned stays.')){ await del('history',id); renderHistory(); }
+  };
+}
+
+$('#btnClearHist').onclick = async () => { if(confirm('Delete every saved transcription from this app? Your Obsidian notes and what it learned stay.')){ await clearStore('history'); renderHistory(); toast('History cleared'); } };
+
+/* ============ learning tab ============ */
+async function renderLearn(){
+  const st=L.stats, pages=st.length, words=st.reduce((s,x)=>s+x.words,0);
+  const acc = arr => { const w=arr.reduce((s,x)=>s+x.words,0), e=arr.reduce((s,x)=>s+x.edits,0); return w?Math.max(0,1-e/w):null; };
+  const first=acc(st.slice(0,10)), last=acc(st.slice(-10));
+  const f = v => v==null?'–':(v*100).toFixed(0)+'%';
+  $('#stats').innerHTML = `
+    <div><b>${pages}</b><small>pages read</small></div>
+    <div><b>${words.toLocaleString()}</b><small>words confirmed</small></div>
+    <div><b>${f(first)}</b><small>accuracy, first 10 pages</small></div>
+    <div><b>${f(last)}</b><small>accuracy, last 10 pages</small></div>
+    <div><b>${Object.keys(L.pairs).length}</b><small>misreads learned</small></div>
+    <div><b>${vocab(9999).length}</b><small>words in your vocabulary</small></div>`;
+  drawChart(st.slice(-40).map(x=>x.words?Math.max(0,1-x.edits/x.words):1));
+  const ch=topChars(15);
+  $('#charList').innerHTML = ch.length ? ch.map(([k,n])=>{ const [a,b]=k.split('→'); return `<li><span>Your <code>${esc(b)}</code> reads as <code>${esc(a)}</code></span><span class="muted">x${n}</span></li>`; }).join('') : '<li class="muted">Correct a few scans and these fill in.</li>';
+  const pr=topPairs(40);
+  $('#pairList').innerHTML = pr.length ? pr.map(p=>`<li><span><code>${esc(p.o)}</code> → <code>${esc(p.f)}</code> <span class="muted">x${p.n}</span></span><button class="x" data-k="${esc(p.o+'→'+p.f)}">✕</button></li>`).join('') : '<li class="muted">Nothing yet.</li>';
+  $('#pairList').onclick = e => { const b=e.target.closest('.x'); if(!b) return; delete L.pairs[b.dataset.k]; saveL(); renderLearn(); };
+  $('#profile').value = L.profile;
+  const refs = await getAll('samples');
+  const c = s => refs.filter(r=>r.style===s).length;
+  $('#refInfo').textContent = `${refs.length} saved (${c('cursive')} cursive, ${c('print')} print, ${c('mixed')} mixed). The newest and the hardest pages are shown to Claude with each scan so it sees what your letters look like.`;
+}
+function drawChart(vals){
+  const cv=$('#chart'), dpr=devicePixelRatio||1, W=cv.clientWidth, H=140; cv.width=W*dpr; cv.height=H*dpr;
+  const x=cv.getContext('2d'); x.scale(dpr,dpr); x.clearRect(0,0,W,H);
+  x.strokeStyle='#2e2a27'; x.fillStyle='#9b9185'; x.font='11px Inter';
+  [0,.5,1].forEach(v=>{ const y=10+(1-v)*(H-30); x.beginPath(); x.moveTo(28,y); x.lineTo(W,y); x.stroke(); x.fillText((v*100)+'%',0,y+4); });
+  if(!vals.length){ x.fillText('No pages yet',W/2-30,H/2); return; }
+  const px = i => 28 + (vals.length===1 ? (W-28)/2 : i*(W-36)/(vals.length-1)), py = v => 10+(1-v)*(H-30);
+  x.strokeStyle='#b8413a'; x.lineWidth=2; x.beginPath(); vals.forEach((v,i)=> i?x.lineTo(px(i),py(v)):x.moveTo(px(i),py(v))); x.stroke();
+  x.fillStyle='#c9a55c'; vals.forEach((v,i)=>{ x.beginPath(); x.arc(px(i),py(v),2.5,0,7); x.fill(); });
+}
+$('#btnSaveProfile').onclick = () => { L.profile=$('#profile').value; saveL(); toast('Profile saved'); };
+$('#btnRebuild').onclick = async () => {
+  const pr=topPairs(100), ch=topChars(40);
+  if(pr.length<5){ toast('Needs a few more corrections first.'); return; }
+  busy(true,'Studying your corrections…');
+  try{
+    const txt = await callClaude(
+      'You write compact handwriting profiles that help a transcriber read one specific person\'s handwriting.',
+      [{type:'text', text:`Here are corrections made to machine reads of Sean's handwriting.\n\nWord misreads (read → actual, count):\n${pr.map(p=>`${p.o} → ${p.f} (${p.n})`).join('\n')}\n\nLetter confusions (read as → actually, count):\n${ch.map(([k,n])=>`${k} (${n})`).join('\n')}\n\nCurrent profile:\n${L.profile||'(none)'}\n\nWrite an updated profile of his letterform quirks in 180 words or fewer, as terse bullet points a transcriber can apply (e.g. "his r often looks like v; trust context"). Only include patterns the data supports. Output only the bullets.`}], 800);
+    L.profile=txt; saveL(); $('#profile').value=txt; toast('Profile rebuilt');
+  }catch(e){ toast(e.message,5000); }
+  busy(false);
+};
+$('#btnClearRefs').onclick = async () => { if(confirm('Remove all saved reference pages?')){ await clearStore('samples'); renderLearn(); } };
+$('#btnExportProblems').onclick = () => {
+  const ch=topChars(25), pr=topPairs(30);
+  if(!ch.length && !pr.length){ toast('Nothing to export yet.'); return; }
+  const md = `---\nupdated: ${fmtDate(Date.now())}\nsource: ghostwriter\ntags: [handwriting]\n---\n\n# Problem letters\n\nPulled from Ghostwriter corrections. These are the letterforms a reader keeps getting wrong.\n\n| My letter | Gets read as | Times |\n|---|---|---|\n${ch.map(([k,n])=>{ const [a,b]=k.split('→'); return `| ${b} | ${a} | ${n} |`; }).join('\n')}\n\n## Words that get misread\n\n${pr.map(p=>`- **${p.f}** read as "${p.o}" (${p.n}x)`).join('\n')}\n`;
+  const folder=S.problemFolder.trim().replace(/^\/+|\/+$/g,'');
+  obsidianNew((folder?folder+'/':'')+'Ghostwriter Problem Letters', md, true);
+};
+
+/* ============ settings ============ */
+const fields=['apiKey','model','refs','vault','folder','filename','tags','problemFolder'];
+function renderSettings(){
+  fields.forEach(k=>$('#s_'+k).value=S[k]);
+  $('#s_keepLines').checked=S.keepLines; $('#s_frontmatter').checked=S.frontmatter;
+}
+fields.forEach(k=>$('#s_'+k).addEventListener('change',e=>{ S[k]=e.target.value.trim(); saveS(); }));
+$('#s_keepLines').onchange=e=>{ S.keepLines=e.target.checked; saveS(); };
+$('#s_frontmatter').onchange=e=>{ S.frontmatter=e.target.checked; saveS(); };
+$('#btnTestKey').onclick = async () => { busy(true,'Knocking…'); try{ await callClaude('Reply with OK.',[{type:'text',text:'ping'}],5); toast('Key works with '+S.model); }catch(e){ toast(e.message,5000); } busy(false); };
+$('#btnExport').onclick = async () => {
+  const data = {v:1, exported:Date.now(), learn:L, samples:await getAll('samples'), history:await getAll('history')};
+  const file = new File([JSON.stringify(data)], `ghostwriter-backup-${fmtDate(Date.now())}.json`, {type:'application/json'});
+  if(navigator.canShare && navigator.canShare({files:[file]})){ try{ await navigator.share({files:[file]}); return; }catch(e){ if(e.name==='AbortError') return; } }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=file.name; a.click();
+};
+$('#btnImport').onclick = () => $('#fileImport').click();
+$('#fileImport').onchange = async e => {
+  const f=e.target.files[0]; e.target.value=''; if(!f) return;
+  try{
+    const d=JSON.parse(await f.text()); if(!d.learn) throw 0;
+    if(!confirm('Replace everything learned on this phone with this backup?')) return;
+    L=Object.assign({},LDEF,d.learn); saveL();
+    await clearStore('samples'); for(const s of d.samples||[]) await put('samples',s);
+    await clearStore('history'); for(const h of d.history||[]) await put('history',h);
+    toast('Backup restored');
+  }catch(err){ toast('That file isn\'t a Ghostwriter backup.'); }
+};
+$('#btnWipe').onclick = async () => {
+  if(!confirm('Erase all learning, reference pages, and history? Export a backup first if you want one.')) return;
+  L=JSON.parse(JSON.stringify(LDEF)); saveL(); await clearStore('samples'); await clearStore('history'); toast('Wiped'); renderLearn();
+};
+
+/* ============ nav ============ */
+function show(tab){
+  document.querySelectorAll('section').forEach(s=>s.classList.toggle('on', s.id==='tab-'+tab));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on', b.dataset.tab===tab || (tab==='review'&&b.dataset.tab==='scan')));
+  if(tab==='history') renderHistory();
+  if(tab==='learn') renderLearn();
+  if(tab==='settings') renderSettings();
+  scrollTo(0,0);
+}
+document.querySelector('nav').onclick = e => {
+  const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.tab==='scan' && session){ show('review'); return; }
+  show(b.dataset.tab);
+};
+
+/* ============ home screen icon ============ */
+(function(){
+  const c=document.createElement('canvas'); c.width=c.height=180; const x=c.getContext('2d');
+  x.fillStyle='#0e0d0c'; x.fillRect(0,0,180,180);
+  x.fillStyle='#b8413a'; x.font='italic 120px Georgia,serif'; x.textAlign='center'; x.textBaseline='middle'; x.fillText('g',92,78);
+  x.strokeStyle='#c9a55c'; x.lineWidth=4; x.beginPath(); x.moveTo(40,140); x.bezierCurveTo(70,120,110,160,142,138); x.stroke();
+  $('#touchIcon').href=c.toDataURL('image/png');
+})();
+navigator.storage?.persist?.();
+drawThumbs();
+</script>
+</body>
+</html>
